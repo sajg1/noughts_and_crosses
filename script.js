@@ -18,7 +18,7 @@ startGame();
 
 
 function startGame() {
-  // This is so that when you hit replay after the eng of a game, it will reset the display to none. If not, the engame box will still be present
+  // This is so that when you hit replay after the end of a game, it will reset the display to none. If not, the engame box will still be present
   document.querySelector(".endgame").style.display = "none";
   // A quick way to create an array of keys. Array.from creates a shallow array from an iterable object. In this case we create an array from an array of 9 keys.
   origBoard = Array.from(Array(9).keys());
@@ -37,4 +37,33 @@ function turnClick(square) {
 function turn(squareId, player) {
   origBoard[squareId] =  player;
   document.getElementById(squareId).innerText = player;
+  // these lines will check every turn whether someone has won the game. If they have then it will trigger the gameOver function.
+  let gameWon = checkWin(origBoard, player)
+  if (gameWon) gameOver(gameWon)
+}
+
+function checkWin(board, player) {
+  // the reduce function in this case checks through the array, origBoard, and checks whether the element in that index is of said player. A ternary function is then used to either concat that index onto the accumulator or to return the accumulator to an empty array.
+  let plays= board.reduce((a,e,i) =>
+    ((e === player)) ? a.concat(i) : a, []);
+  let gameWon = null;
+  // using entries is a way to get both the index and the data at that index
+  for ( let [index, win] of winCombos.entries()) {
+    // indexOf will return -1 if nothing is present so thats why we check against -1.
+    if (win.every(elem => plays.indexOf(elem) > -1)) {
+      gameWon = { index: index, player: player};
+      break;
+    }
+  }
+  return gameWon;
+}
+
+function gameOver(gameWon) {
+  for (let index of winCombos[gameWon.index]) {
+    document.getElementById(index).style.backgroundColor =
+    gameWon.player == humanPlayer ? "aqua" : "red";
+  }
+  for( var i = 0; i < cells.length; i++) {
+    cells[i].removeEventListener('click', turnClick, false)
+  }
 }
