@@ -11,6 +11,7 @@ td {
 }
 
 table {
+  margin-top: 100px;
   border-collapse: collapse;
   position: absolute;
   left: 50%;
@@ -20,6 +21,7 @@ table {
 
 table tr:first-child td {
   border-top: 0;
+
 }
 table tr:last-child td {
   border-bottom: 0;
@@ -46,4 +48,12 @@ table tr td:last-child {
   border-radius: 5px;
   color: white;
   font-size; 2em;
+}
+
+h1 {
+  text-align: center;
+  vertical-align: middle;
+  font-family: sans-serif;
+  font-size: 54px;
+  cursor: pointer;
 }

@@ -21,6 +21,7 @@ function startGame() {
   // This is so that when you hit replay after the end of a game, it will reset the display to none. If not, the engame box will still be present
   document.querySelector(".endgame").style.display = "none";
   // A quick way to create an array of keys. Array.from creates a shallow array from an iterable object. In this case we create an array from an array of 9 keys.
+  // Once a turn is taken the index number will then be replaced with the corresponding players character.
   origBoard = Array.from(Array(9).keys());
   // This for loop will clear all text in each cell and remove the background color from any of the winning cells.
   for( var i = 0; i < cells.length; i++) {
@@ -28,18 +29,26 @@ function startGame() {
     cells[i].style.removeProperty('background-color');
     cells[i].addEventListener('click', turnClick, false);
   }
+  console.log(origBoard);
 }
 
 function turnClick(square) {
+  // checks whether the square in the baord is still a number or been changed to a players character.
+  if (typeof origBoard[square.target.id] == 'number') {
   turn(square.target.id, humanPlayer)
+  }
+  if (!checkTie()) {
+    turn(bestPosition(), aiPlayer);
+  }
 }
+
 
 function turn(squareId, player) {
   origBoard[squareId] =  player;
   document.getElementById(squareId).innerText = player;
   // these lines will check every turn whether someone has won the game. If they have then it will trigger the gameOver function.
   let gameWon = checkWin(origBoard, player)
-  if (gameWon) gameOver(gameWon)
+  if (gameWon) gameOver(gameWon);
 }
 
 function checkWin(board, player) {
@@ -61,9 +70,35 @@ function checkWin(board, player) {
 function gameOver(gameWon) {
   for (let index of winCombos[gameWon.index]) {
     document.getElementById(index).style.backgroundColor =
-    gameWon.player == humanPlayer ? "aqua" : "red";
+    gameWon.player == humanPlayer ? "green" : "red";
   }
   for( var i = 0; i < cells.length; i++) {
     cells[i].removeEventListener('click', turnClick, false)
   }
+  declareWinner(gameWon.player == humanPlayer ? "You Win!" : "You Lose :(");
+}
+
+function declareWinner(who) {
+  document.querySelector(".endgame").style.display = "block";
+  document.querySelector(".endgame .text").innerText = who;
+}
+
+function emptySquares() {
+  return origBoard.filter(square => typeof square == "number")
+}
+
+function bestPosition() {
+  return emptySquares()[Math.floor(Math.random()*emptySquares().length)];
+}
+
+function checkTie() {
+  if ( emptySquares().length == 0) {
+    for ( var i = 0; i < cells.length; i++) {
+      cells[i].style.backgroundColor = "aqua";
+      cells[i].removeEventListener('click', turnClick, false)
+    }
+    declareWinner("It's a Draw!!")
+    return true;
+  }
+  return false;
 }
